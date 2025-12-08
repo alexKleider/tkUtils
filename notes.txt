@@ -1,0 +1,44 @@
+tk.Tk() ==> provides the top level "root" window(top level frame.)
+    instances can "self-assign"
+        title (rootTitle)
+        geometry ("700x900")
+        resizable (False, False)
+        config (bg="#f0f0f0")
+    method:
+        .mainloop()  # starts event loop (to keep window open)
+
+Functions to associate with widgets declared here...
+
+Add "widgets" next....
+    Frames containing other widgets...
+        tk.Frame(<root-window> # parent is the first param
+            bg="#4a7c9e"  # background setting param
+            methods:
+                .pack(pady=15)
+    Contained widgets...
+        tk.Label(<frame>, text..., font..., bg..., fg..., ...)
+            methods:
+                .pack(...
+        tk.Entry(<frame>, width, font, bd, relief....
+            methods:
+                .pack(
+                .bind("<Return>", lambda event: add_task()   )
+        tk.Button(<frame>, text, width, font, bg, fg, bd,
+                    cursor, command)
+            methods:
+                .pack(
+        tk.Scrollbar(<frame>, orient=tk.VERTICAL)
+            methods:
+                .pack(
+        tk.Listbox(<frame>, width, height, font, bd, relief,
+                    selectmode, activestyle, bg, 
+                    selectbackground, selectforeground,
+                    yscrollcommand=scrollbare.set)
+            methods:
+                .pack(
+        tk.Button(<frame>, text, width, font, bg, fg,
+                    activebackground, bd, cursor,
+                    command=<a func> )
+            methods:
+                .grid(row, column, padx, pady, ipady    )
+
