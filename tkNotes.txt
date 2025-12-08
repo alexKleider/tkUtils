@@ -1,3 +1,6 @@
+
+# File: tkNotes.txt  (AI generated)
+
 tk.Tk() ==> provides the top level "root" window(top level frame.)
     instances can "self-assign"
         title (rootTitle)
@@ -11,15 +14,18 @@ Functions to associate with widgets declared here...
 
 Add "widgets" next....
     Frames containing other widgets...
+        A container widget to organize other widgets.
         tk.Frame(<root-window> # parent is the first param
             bg="#4a7c9e"  # background setting param
             methods:
                 .pack(pady=15)
     Contained widgets...
         tk.Label(<frame>, text..., font..., bg..., fg..., ...)
+            Displays static text or images.
             methods:
                 .pack(...
         tk.Entry(<frame>, width, font, bd, relief....
+            Allows sintle-line text input
             methods:
                 .pack(
                 .bind("<Return>", lambda event: add_task()   )
@@ -39,6 +45,26 @@ Add "widgets" next....
         tk.Button(<frame>, text, width, font, bg, fg,
                     activebackground, bd, cursor,
                     command=<a func> )
+            A clickable button.
             methods:
                 .grid(row, column, padx, pady, ipady    )
+    Also:
+          tk.Text: Allows multi-line text input and display.
+          tk.Checkbutton: A checkbox for boolean choices.
+          tk.Radiobutton: Allows selection of one optioin from a
+                      group.
+          tk.Canvas: Provides drawing capabilities.
+          tk.Scale: A slider widget for selecting a numerical value.
+          tk.Menu: Creates dropdown menus and menu bars.
+          tk.Menubutton: ...when clicked, displays a menu.
+          tk.Message: Displays a multi-line message.
+          tk.PanedWindow: A container that allows resizing
+                        its child widgets.
+          tk.Spinbox: An entry widget with up and down arrows
+                        for incrementing/decrementing values.
+          tk.Toplevel: A separate, top-level window container.  
+          tk.LabelFrame: A container widget with a label, used
+                        for grouping complex widgets.
 
+The tkinter.ttk module provides modern, themed alternatives
+for many standard widgets, plus a few new ones.
