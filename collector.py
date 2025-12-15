@@ -4,11 +4,17 @@
 
 import tkinter as tk
 
-def updated_mapping(root_title, entries):
+"""
+Provides a way of setting up a mapping for modification or entry of
+values.  These are collected into what must be a global value:
+    <global_res>
+"""
+
+def updated_mapping(entries, root_title="Record Update"):
     """
     <entries> is a mapping, the values of which can be updated
-    in a window labeled <root_title> and retrieved using
-    <global_res> which must exist globally.
+    in a window labeled <root_title> and retrieved.
+    Retrieval depends on <global_res> which must exist globally.
     """
     def submit_data():
         res = {}
@@ -52,6 +58,6 @@ if __name__ == "__main__":
     root_title = "User Info"
     global_res = {}  # collects info from the gui window
     
-    updated_mapping(root_title, entries)
+    updated_mapping(entries, root_title)
     for key, value in global_res.items():
         print(f"{key}: {value}")

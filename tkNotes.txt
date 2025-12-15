@@ -68,3 +68,28 @@ Add "widgets" next....
 
 The tkinter.ttk module provides modern, themed alternatives
 for many standard widgets, plus a few new ones.
+
+
+Vertical Menu
+=============
+In Python's Tkinter, a "non-cascading" vertical menu refers to a
+sidebar-style navigation layout where menu items are displayed as
+a vertical list rather than as nested dropdowns. Standard Tkinter
+Menu widgets are designed for horizontal top-level bars or cascading
+submenus and cannot be natively packed vertically on the side of a window.
+
+To create a vertical navigation menu, you must build a custom
+sidebar using a Frame and Button widgets
+
+Steps to Create a Vertical Menu
+-------------------------------
+1. Create a Container Frame: use tk.Frame to hold the menu items.
+Set its width and height and pack or grid to the left or right side.
+2. Add Menu Items: Use tk.Button widgets for each menu entry.
+Standard buttons can trigger functions using the command attribute.
+3. Layout Vertically: Use the pack() manager with side="top" or the 
+grid() manager to stack the buttons vertically within the frame.
+4. Stying (Optional): to make it look like a "menu," remove button
+borders (bd=0), set a flat relief (relief="flat"), and use consistent
+background colors for the frame and buttons.
+
