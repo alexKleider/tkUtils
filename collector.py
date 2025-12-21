@@ -10,6 +10,8 @@ values.  These are collected into what must be a global value:
     <global_res>
 """
 
+global_res = {}  # collects info from the gui window
+
 def updated_mapping(entries, root_title="Record Update"):
     """
     <entries> is a mapping, the values of which can be updated
@@ -47,8 +49,11 @@ def updated_mapping(entries, root_title="Record Update"):
     submit_button.grid(row=row, column=1)
 
     root.mainloop()
+#   print (f"{global_res=}")
+    return global_res
 
-if __name__ == "__main__":
+
+def run_updated_mapping():
     entries = {
             "First": "Alex",
             "Last": "Kleider", 
@@ -56,8 +61,11 @@ if __name__ == "__main__":
              }
     
     root_title = "User Info"
-    global_res = {}  # collects info from the gui window
     
-    updated_mapping(entries, root_title)
-    for key, value in global_res.items():
+
+    for key, value in updated_mapping(entries, root_title).items():
         print(f"{key}: {value}")
+
+if __name__ == "__main__":
+    run_updated_mapping()
+
