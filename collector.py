@@ -4,26 +4,23 @@
 
 import tkinter as tk
 
-"""
-Provides a way of setting up a mapping for modification or entry of
-values.  These are collected into what must be a global value:
-    <global_res>
-"""
+""" Provides function <updated_mapping>.  """
 
 global_res = {}  # collects info from the gui window
 
 def updated_mapping(entries, root_title="Record Update"):
     """
-    <entries> is a mapping, the values of which can be updated
-    in a window labeled <root_title> and retrieved.
+    Provides a way of entering or modifying the values of a
+    <mapping>, presented in a window labeled <root_title>.
+    Returns None if closed without using the submit button.
+    The <submit> button causes return of a new mapping with
+    the visible values. The original mapping is left unchanged.
     Retrieval depends on <global_res> which must exist globally.
     """
     def submit_data():
-        res = {}
-        for key in entries.keys():
-            res[key] = str_vars[key].get()
         global global_res
-        global_res = res
+        for key in entries.keys():
+            global_res[key] = str_vars[key].get()
         root.destroy()
 
     root = tk.Tk()
@@ -49,22 +46,22 @@ def updated_mapping(entries, root_title="Record Update"):
     submit_button.grid(row=row, column=1)
 
     root.mainloop()
-#   print (f"{global_res=}")
+#   print (f"{res=}")
     return global_res
 
 
 def run_updated_mapping():
     entries = {
-            "First": "Alex",
-            "Last": "Kleider", 
-            "Phone": "650/269-8936",
+            "First": "Joe",
+            "Last": "Blow", 
+            "Phone": "333/333-3333",
              }
-    
     root_title = "User Info"
-    
-
-    for key, value in updated_mapping(entries, root_title).items():
-        print(f"{key}: {value}")
+    res = updated_mapping(entries, root_title)
+    print(f"{res=}")
+    if res:
+        for key, value in res.items():
+            print(f"{key}: {value}")
 
 if __name__ == "__main__":
     run_updated_mapping()
