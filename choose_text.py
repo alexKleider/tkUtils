@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# File: text_menu.py
+# File: choose_text.py
 
 import tkinter as tk
 
@@ -11,7 +11,6 @@ choices = ["Apple", "Banana", "Cherry", "Date", "Elderberry"]
 returned_choice = "No selection made"
 
 def text_menu(choices=choices, rootTitle=root_title):
-
 
     def show_selection(event):
         # Get the index of the selected item
