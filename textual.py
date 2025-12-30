@@ -194,6 +194,8 @@ def people_choices(header_prompt="Enter hints: % = wild card"):
         mapping[key] = ''
     data = get_fields(mapping,
           header = 'Enter hints using "%" as wild cards:')
+#   _ = input(f"values: {[value for value in data.values() if value]}")
+    if not [value for value in data.values() if value]: return
     query_lines = [
         "SELECT *",
             "FROM People WHERE ", ]
@@ -211,6 +213,7 @@ def people_choices(header_prompt="Enter hints: % = wild card"):
     query_lines.append(additional_lines)
     query = ' '.join(query_lines)
     query = query+"ORDER BY last, first"+';'
+#   _ = input(query)
     ret = routines.query2dict_listing(query, keys,
             from_file=False)
     return ret
@@ -243,8 +246,9 @@ def run_get_demographics():
 def run_people_choices():
     ret = people_choices(header_prompt="Enter hints: % = wild card")
     if ret:
+        print("Collected the following records...")
         for item in ret:
-            print(item)
+            print([value for value in item.values()])
     else:
         print("No matches found")
 
