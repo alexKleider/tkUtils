@@ -1,0 +1,67 @@
+
+#  https://tkdocs.com/tutorial/firstexample.html
+
+from tkinter import *
+from tkinter import ttk
+
+Creating widgets alows use of params to override defaults:
+>>> mainframe = ttk.Frame(root, padding=(3, 3, 12, 12))  # padding
+# (left, top, right, bottom)
+Placement (after creation:)
+>>> mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+We put a frame inside the main widow since the latter
+isn't itself part of the newer "themed" widgets.
+
+First functional widget created is an Entry widget:
+>>> feet = StringVar()
+>>> feet_entry = ttk.Entry(mainframe, width=7, textvariable=feet)
+>>> feet_entry.grid(column=2, row=1, sticky=(W, E))
+We override the default with 'width=7' (7 chars)
+The 'grid' method is used to specify location
+The 'sticky' option specifies how the widget should
+line up within the grid cell, using compass directions.
+
+>>> meters = StringVar()
+>>> ttk.Label(mainframe, textvariable=meters).grid(  # create widget
+                    column=2, row=2, sticky=(W, E))  # & call method
+                    # rather than using two lines as before.
+>>> ttk.Button(mainframe, text="Calculate", command=calculate).grid(
+                    column=3, row=3, sticky=W)
+>>> ttk.Label(mainframe, text="feet").grid(column=3, row=1, sticky=W)
+>>> ttk.Label(mainframe, text="is equivalent to").grid(
+                    column=1, row=2, sticky=E)
+>>> ttk.Label(mainframe, text="meters").grid(column=3, row=2, sticky=W)
+
+# Add some polish...                  # In event of window resizing:  
+>>> root.columnconfigure(0, weight=1) # contained frame also resizes
+>>> root.rowconfigure(0, weight=1)    # to fill available space.
+>>> mainframe.columnconfigure(2, weight=1)  # expands contents horiz
+>>> for child in mainframe.winfo_children():
+>>>     child.grid_configure(padx=5, pady=5)
+>>> feet_entry.focus()
+>>> root.bind("<Return>", calculate)
+The columnconfigure/rowconfigure bits tell Tk that the content
+frame should expand to fill any extra space if the window is
+resized and that the column in the content frame containing the
+entry should expand horizontally to fill any extra space.
+Process contained widgets adding padding to prevent scruching.
+Put focus on entry widget (prepared cursor for data entry.)
+Final line makes "Return" equivalent to Calculate button.
+
+Performing the Calculation (the 'call back'?)
+>>> def calculate(*args):
+>>>     try:
+>>>         value = float(feet.get())
+>>>         meters.set(round(0.3048 * value, 4))
+>>>     except ValueError:
+>>>         pass
+Here's where the textvariable options come into play. The global
+variable feet was specified as the textvariable for the entry.
+Whenever the entry changes, the global variable feet is updated.
+Any textvariable change is reflected in a widget update.
+Caveat for Python: these variables must be SringVar instances.
+Start the event loop:
+>>> root.mainloop()  # runs for remainder of our application
+Makes widgets appear & respond to changes, alows user interaction.
+See encapsulated version in ft2mEncap.py
+

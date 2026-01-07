@@ -1,5 +1,5 @@
 
-# File: tkNotes.txt  (AI generated)
+# File: tkUINotes.txt  (AI generated)
 
 tk.Tk() ==> provides the top level "root" window(top level frame.)
     instances can "self-assign"

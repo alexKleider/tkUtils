@@ -6,6 +6,10 @@ import tkinter as tk
 from tkinter import messagebox
 import routines
 
+"""
+global_choice = None  # used globally to collect
+global_res = {}         # info from the gui window
+"""
 # the following function should be elsewhere!?!
 # is it even needed?
 junk = '''
@@ -39,7 +43,9 @@ def keys_from_schema(table, brackets=(0,0)):
 # File: akfYN.py
 
 def yn(title, message):
-
+    """
+    basic tk method to get a yes or no answer
+    """
     def show_yes_no_dialog():
         result = messagebox.askyesno(title, message)
         root.quit()
@@ -59,9 +65,11 @@ def yn(title, message):
     return ret
 
 def yes_no(text, title="Run query?"):
+    """Code base version"""
     return yn(message, title)
 
 def checkYN():
+    """tests yn and yes_no"""
     title = "Exit Application"
     message = """This could be a very long message.
         Several lines long, infact!
@@ -71,9 +79,38 @@ def checkYN():
         print("Returning True")
     else:
         print("Returning False")
+#====================================
+# File: choose_text.py
+global_choice = None  # used globally
 
+def text_menu(choices, rootTitle):
+    """
+    basic tk menu
+    Returns a choice selected from <choices>, a list of strings.
+    """
+    def show_selection(event):
+        # Get the index of the selected item
+        global global_choice
+        selection_index = listbox.curselection()
+        if selection_index:
+            # Get the value of the selected item
+            selected_item = listbox.get(selection_index[0])
+            label.config(text=f"Selected: {selected_item}")
+            global_choice = selected_item
+            root.quit()
+    root = tk.Tk()
+    root.title("Listbox Menu Example")
+    listbox = tk.Listbox(root, selectmode=tk.SINGLE)
+    listbox.pack(padx=10, pady=10)
+    for item in choices:
+        listbox.insert(tk.END, item)
+    listbox.bind('<<ListboxSelect>>', show_selection)
+    label = tk.Label(root, text="Select an item")
+    label.pack(pady=10)
+    root.mainloop()
+    return global_choice
 
-
+#====================================
 # File: collector.py
 """ Provides function <updated_mapping>.  """
 global_res = {}  # collects info from the gui window
@@ -126,35 +163,6 @@ def get_fields(fields, header="Enter values for each key"):
     """
     return updated_mapping(fields, root_title=header)
 
-
-# File: choose_text.py
-root_title = "Root Title"
-# List of choices
-choices = ["Apple", "Banana", "Cherry", "Date", "Elderberry"]
-returned_choice = None
-
-def text_menu(choices=choices, rootTitle=root_title):
-    def show_selection(event):
-        # Get the index of the selected item
-        global returned_choice
-        selection_index = listbox.curselection()
-        if selection_index:
-            # Get the value of the selected item
-            selected_item = listbox.get(selection_index[0])
-            label.config(text=f"Selected: {selected_item}")
-            returned_choice = selected_item
-            root.quit()
-    root = tk.Tk()
-    root.title("Listbox Menu Example")
-    listbox = tk.Listbox(root, selectmode=tk.SINGLE)
-    listbox.pack(padx=10, pady=10)
-    for item in choices:
-        listbox.insert(tk.END, item)
-    listbox.bind('<<ListboxSelect>>', show_selection)
-    label = tk.Label(root, text="Select an item")
-    label.pack(pady=10)
-    root.mainloop()
-    return returned_choice
 
 def edit_person_status():
     _ = input("edit_person_status hasn't been 'translated'!")
@@ -219,6 +227,60 @@ def people_choices(header_prompt="Enter hints: % = wild card"):
     return ret
 
 
+def pick(query, format_string,
+                header="CHOOSE ONE",
+                subheader="Choices are...",
+                report=None):
+    """
+    Uses <query> to collect a list of dicts and presents
+    user with a list of choices dictated by
+    the format_string.
+    Returns chosen dict or None (if none available or
+    user aborts/cancels.)
+    """
+    mappings = routines.query2dicts(query)
+    if not mappings:
+        return
+    options = [format_string.format(**rec)
+            for rec in mappings]
+    listing = zip(range(len(options)), options)
+    for_display = [f"{item[0]:>2}: {item[1]}"
+                for item in listing]
+    #===================================
+    layout=[[sg.Text(subheader,size=(50,1),
+#           font='Lucida',justification='left'
+            )],
+            [sg.Listbox(values=for_display,
+                select_mode='extended',
+                key='CHOICE', size=(50,len(mappings)))],
+            [sg.Button('SELECT',
+#               font=('Times New Roman',12)
+                ),
+            sg.Button('CANCEL',
+#                   font=('Times New Roman',12)
+                    )
+            ]]
+    win =sg.Window(header,layout)
+    e, v = win.read()
+    win.close()
+    if not v["CHOICE"]:
+        return
+    chosen_item = v['CHOICE'][0].strip().split()[0][:-1]
+    if (e != "SELECT") or not v['CHOICE']:
+        helpers.add2report(report,
+            "pick returning None", also_print=True)
+        return
+    else:
+        helpers.add2report(report,
+            ["code.textual.pick:",
+            "  line chosen...",
+            f"    {repr(v['CHOICE'])}",
+            "  record returned:",
+            f"    {repr(mappings[int(chosen_item)])}"],
+            also_print=False)
+        return mappings[int(chosen_item)]
+
+
 ## Testing follows....
 
 def run_updated_mapping():
@@ -252,13 +314,115 @@ def run_people_choices():
     else:
         print("No matches found")
 
+def pick_person(header='Hints (use "%" as wild card)',
+                subheader=""):
+    """
+    Returns a person record from the People table
+        or None.
+    Used to obtain a record
+    """
+    while True:
+        # 1st collect the 'hints' ==> data:
+        fields = routines.keys_from_schema(
+                        "People", brackets=(1,7))
+        hints = {}
+        for field in fields:
+            hints[field] = ""
+        while True:
+            res = updated_mapping(hints, root_title=header)
+            values = [value if value for value in res.values()]
+            if not values:  # checking for an empty list
+                print("Got an empty list; try again.")
+                continue
+        query_lines = [
+            "Select personID, first, last, suffix",
+                "from People where ", ]
+        additional_lines = []
+        if data['first']:
+            additional_lines.append(
+                f"""first like "{data['first']}" """)
+        if data['last']:
+            additional_lines.append(
+                f"""last like "{data['last']}" """)
+        if data['suffix']:
+            additional_lines.append(
+                f"""suffix like "{data['suffix']}" """)
+        if not additional_lines:
+            print("No clues provided; going again")
+            continue
+        additional_lines = " AND ".join(additional_lines)
+        query_lines.append(additional_lines)
+        query = ' '.join(query_lines)
+        query = query+';'
+#       _ = input(query)
+        ret = routines.fetch(query, from_file=False)
+        if not ret: continue
+#       _ = input(repr(ret))
+#       for item in ret:
+#           print(item)
+        choices = ["{0!s:>3} {1:} {2:} {3:}".format(*item) 
+            for item in ret]
+
+        #define layout
+        layout=[[sg.Text(subheader,size=(30,1),
+                )],
+                [sg.Combo(choices,
+                    default_value=choices[0],
+                    key='choice')],
+                [sg.Button('SELECT',
+                    ),
+                sg.Button('CANCEL',
+                        )
+                ]]
+
+#       layout=[[sg.Text(choice), sg.InputText()]
+#               for choice in choices]
+#       layout.append([sg.Button('OK'),
+#           sg.Button('Cancel')])
+        #Define Window
+        win =sg.Window(header,layout)
+        #Read  values entered by user
+        e, v = win.read()
+        #close first window
+        win.close()
+        #access the selected value in the list box
+        #and add them to a string
+#       print(f"e returns {e}")
+        if e == "CANCEL":
+            continue
+        elif e == None:
+            return
+        else:
+    #       print("you chose: ",end='')
+    #       print(repr(v['choice']))
+            return routines.get_rec_by_ID(
+                int(v['choice'].split()[0]))
+
+def run_pick_person():
+    while True:
+        record = input(repr(pick_person()))
+        print(repr(record))
+        yn = input("Continue? (y/n) ")
+        if not (yn and yn[0] in 'yY'):
+            break
+
+
+
+def run_text_menu():
+    root_title = "Root Title"
+    choices = ["Apple", "Banana", "Cherry", "Date", "Elderberry"]
+    print(f"Running test of text_menu...")
+    print(f"Returning '{text_menu(choices, root_title)}'")
+
 
 if __name__ == "__main__":
 #   run_updated_mapping()
 #   checkYN()
 #   print(f"Returning '{text_menu()}'")
 #   run_get_demographics()
-    run_people_choices()
+#   run_people_choices()
+#   run_text_menu()
+    run_pick_person()
 
 
 
