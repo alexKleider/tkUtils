@@ -1,0 +1,100 @@
+
+# File: concepts.txt
+
+# https://tkdocs.com/tutorial/concepts.html
+
+Widgets
+=======
+Widgets are things visible onscreen. (AKA Controls or Windows)
+Individual widgets are objects, instances of classes that
+represent buttons, frames, and so on.
+To create a widget: need to identify its specific class and
+its parent widget fitting it into a widow hierarchy, with a
+single root at the top of the hierarchy.
+Each widget is a Python object with a parent specified as its
+first parameter. The only exception is the "root" window
+automatically created when Tk is instantiated.
+Whether or not you save the widget object in a variable is entirely
+up to you, depending on whether you'll need to refer to it later.
+All widgets have multiple (display or behavor) configuration options
+with sensible defaults. Each has only a few configuration options that
+are commonly used and which can be set at creation or set, reset or 
+retrieved any time later (with few exceptions.)
+Widgets can be queried for their supported options. See config.txt
+
+Styles & Themes
+===============
+Appearance details have been moved into theme and style objects
+which can be used as widget paramaters rather than individual params
+for each widgit instance.
+Themes collect a series of styles, putting all appearance decisions
+in one place promoting consistency and improves reuse.
+
+Widget Introspection
+====================
+Tk exposes information about each widget. Much of it is available via
+the winfo facility; see the winfo command reference for full details.
+
+    def print_hierarchy(w, depth=0):
+        print('  '*depth + w.winfo_class() + ' w=' + 
+                str(w.winfo_width()) + ' h=' + str(w.winfo_height()) +
+                ' x=' + str(w.winfo_x()) + ' y=' + str(w.winfo_y()))
+        for i in w.winfo_children():
+            print_hierarchy(i, depth+1)
+
+    print_hierarchy(root)
+
+Some of the Most Useful Methods
+-------------------------------
+winfo_class: a class identifying the type of widget
+winfo_children: a list of a widget's direct children
+winfo_parent: parent of the widget
+winfo_toplevel: the toplevel window containing this widget
+winfo_width, winfo_height: current width and height of the widget
+                not accurate until it appears onscreen
+winfo_reqwidth, winfo_reqheight: requested width and height
+winfo_x, winfo_y: the position of the top-left corner relative to its parent
+winfo_rootx, winfo_rooty: displayed or hidden
+        (to be viewable all ancestors must be viewable 
+
+Geometry Management (on screen placement of widgets)
+=================== --------------------------------
+Simple creation of a widget does _not_ place it on the screen.
+Grid: a geometry manager. (There are several in Tk.)
+Note the parent/child (Master/Slave) relationships between widgets
+and the recursive nature of changes.
+Geometry manager parameters: eg row, column, sticky.
+
+Event Handling
+==============
+Tk runs and manages an event loop that receives events from the OS:
+button presses, keystrokes, mouse movements, window resizing, etc
+Critical that the event loop not be blocked!  ∴ avoid long operations.
+Responses to events can be customized by specifying a callback via a
+widget comfiguration option. Callbacks call some other func or method.
+For events that don't have a widget-specific callback configuration
+option associated with them, you can use Tk's bind to capture any
+event and then (like with callbacks) execute an arbitrary piece of
+code. Callbacks call some other func or method.
+For events that don't have a widget-specific callback configuration
+option associated with them, you can use Tk's bind to capture any
+event and then (like with callbacks) execute an arbitrary piece of
+code. A (silly) example follows:
+>>> from tkinter import *
+>>> from tkinter import ttk
+>>> root = Tk()
+>>> l = ttk.Label(root, text="Starting...")
+>>> l.grid()
+>>> l.bind('<Enter>', lambda e: l.configure(text='Moved mouse inside'))
+>>> l.bind('<Leave>', lambda e: l.configure(text='Moved mouse outside'))
+>>> l.bind('<ButtonPress-1>', lambda e: l.configure(
+                                      text='Clicked left mouse button'))
+>>> l.bind('<3>', lambda e: l.configure(text='Clicked third mouse button'))
+>>> l.bind('<Double-1>', lambda e: l.configure(text='Double clicked'))
+>>> l.bind('<B3-Motion>', lambda e: l.configure(
+                             text=f'third button drag to {e.x},{e.y}'))
+>>> root.mainloop()
+
+# see binding.py
+
+
