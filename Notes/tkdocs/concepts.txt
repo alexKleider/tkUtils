@@ -97,4 +97,78 @@ code. A (silly) example follows:
 
 # see binding.py
 
+Multiple Bindings for an Event
+==============================
+Up to now: event bindings assigned to a widget; matching event
+triggers the binding.
+A binding can capture not only a single event but a short sequence of
+events. The <Double-1> binding triggered by 2 clicks.
+Alternatively can use <KeyPress-a><KeyPress-b> or <a><b>.
+Case matters! To bind to a capital A, use <KeyPress-A> or <A>.
+Event bindings may be assigned to a parent window and will be
+triggered when a matching event occurs anywhere in that widow.
+Less commonly, you can create event bindings triggered when a
+matching event occurs anywhere in the application or even for
+events received by any widget of a given class, e.g., all buttons.
+More than one binding can fire for an event keeping event handlers
+concise and limited in scope, making for more modular code.
+For example, the behavior of each widget class in Tk is itself defined
+with script-level event bindings. These stay separate from event bindings
+in your application. Event bindings assigned to a widget can also be
+changed (or deleted) at any time. They can be modified to alter event
+handling for widgets of a certain class or parts of your application.
+You can reorder, extend, or change the sequence of event bindings that
+are triggered for each widget; see the bindtags command reference
+if you're curious. 
+
+Available Events
+================
+The most common events are described below, along with the
+circumstances when they are generated. Some are generated on some
+platforms and not others. For a complete description see the
+bind command reference.
+<Activate>: Window has become active.
+<Deactivate>: Window has been deactivated.
+<MouseWheel>: Scroll wheel on mouse has been moved.
+<KeyPress>: Key on keyboard has been pressed down.
+<KeyRelease>: Key has been released.
+<ButtonPress>: A mouse button has been pressed.
+<ButtonRelease>: A mouse button has been released.
+<Motion>: Mouse has been moved.
+<Configure>: Widget has changed size or position.
+<Destroy>: Widget is being destroyed.
+<FocusIn>: Widget has been given keyboard focus.
+<FocusOut>: Widget has lost keyboard focus.
+<Enter>: Mouse pointer enters widget.
+<Leave>: Mouse pointer leaves widget. 
+
+Event details:
+For mouse events: the button that was pressed, e.g., 1, 2, or 3.
+For keyboard events, the specific key, e.g., A, 9, space, plus,
+comma, equal. For a complete list: keysyms command reference.
+Event modifiers can include:
+B1 or Button1 to signify the main mouse button being held down,
+Double or Triple for sequences of the same event.
+Key modifiers for when keys on the keyboard are held down
+inline Control, Shift, Alt, Option, and Command.
+
+Virtual Event
+=============
+So far have dealt with low-level OS events: mouse clicks and window resizes.
+Many widgets also generate higher-level, semantic events called virtual events
+indicated by << >> around the event name, e.g., <<foo>>.
+A <<ListboxSelect>> is generated when ever the listbox widget's
+selection changes regardless how: user click, arrow key selection, etc
+... no need to set up multiple event bindings to capture common changes.
+See documentation for a widget class's available virtual events
+
+Tk also defines virtual events such as <<Cut>>, <<Copy>> and <<Paste>>.
+A <<ContextMenu>> virtual event is generated when the right mouse button
+is clicked (to take care of macOS button discrepancy.)
+
+You can define your own virtual events, possibly specific to your
+application. i.e. to keep platform-specific details isolated in a single
+module while using the virtual event throughout your application.
+
+>>> root.event_generate("<<MyOwnEvent>>")
 
