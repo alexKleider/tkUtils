@@ -1,1 +1,207 @@
 # File: widgets.txt   https://tkdocs.com/tutorial/widgets.html
+
+Widgets
+=======
+
+Frame (first of the "themed widgets")
+-----
+Displays as a simple rectangle helping to organize the UI
+Often act as parent/master widgets for a geometry manager (gm.)
+>>> frame = ttk.Frame(parent)
+Configuration Options:
+    Requested size:
+        size is typically controled by a gm based on content.
+        If there's no content: use width/height config options:
+            >>> frame['width'] = 500  # an int
+            >>> frame['height'] = 400
+        Even if specified, the gm has the final say!
+    Screen distance specifications:
+        "500" (units unspecified) defaults to pixels  [int]
+        "350c" centimeters, ..m mm, ..i inches,   [string]
+            ..p printer's points (1/72")
+            >>> frame['width'] = '500p'  # a string
+            # 500 points (just under 7 inches)
+        Pixels is the default but using points may be a better bet,
+    Padding:
+        Extra space around inside of a widget.
+            >>> frame['padding'] = 5       # 5 pixels on all sides
+            >>> frame['padding'] = (5, 10)
+                        # 5 on left and right, 10 on top and bottom
+            >>> frame['padding'] = (5, 7, 10, 12)
+                        # left: 5, top: 7, right: 10, bottom: 12
+    Boarders:
+        Around a frame widget
+            >>> frame['borderwidth'] = 2  # default is 0
+            >>> frame['relief'] = 'sunken'  # default is "flat"
+                others: "raised", "sunken", "solid", "ridge", "groove"
+    Styles: common to all themed widgets  (new ttk widgets only)
+        >>> s = ttk.Style()
+        >>> s.configure('Danger.TFrame', background='red',
+                            borderwidth=5, relief='raised')
+        >>> ttk.Frame(root, width=200, height=200,
+                            style='Danger.TFrame').grid()
+Label
+-----
+Displays (text or image) typically for viewing, not interacting.
+    >>> label = ttk.Label(parent, text='Full name:')
+    # Displayed text or image often specified as a config option
+    # Can be changed at any time
+    # Can monitor a (StringVar) variable and update any changes
+    >>> resultsContents = StringVar()
+    >>> label['textvariable'] = resultsContents
+    >>> resultsContents.set('Initial value to display')
+    Use get or set methods to read or write current variable value:
+    >>> current = resultsContents.get()
+    >>> resultsContents.set('New value to display)
+Displaying images:
+    >>> image = PhotoImage(file='myimage.png')  # create an image object
+    >>> label['image'] = image  # use image config option
+Text & Images:
+    Use the "compound" cofig option which accepts:
+        none (default): image only if available, else text option
+        text: ignore any image
+        image: ignore text
+        center: text in center
+        top, bottom, left, right: image above/below/left/right of text
+        >>> label['compount'] = tk.LEFT
+Fonts, colours, etc
+    Best to use a style assigned using the style option.
+    Some predefined fonts available:
+        TkDefaultFont: Default for all GUI items not otherwise specified.
+        TkTextFont: Used for entry widgets, listboxes, etc.
+        TkFixedFont: A standard fixed-width font.
+        TkMenuFont: The font used for menu items.
+        TkHeadingFont: for column headings in lists and tables.
+        TkCaptionFont: A font for window and dialog caption bars.
+        TkSmallCaptionFont: For subwindows or tool dialogs.
+        TkIconFont: A font for icon captions.
+        TkTooltipFont: A font for tooltips. 
+    Font choices are platform-specific!
+        >>> label['font'] = "TkDefaultFont"
+    Foreground (for text) and Background colours:  ?! on macOS
+        >>> label['foreground'] = "red"
+        >>> label['background'] = "#ff340a"
+    Labels also accept the relief configuration option
+    Lable layout is largely determined by gm but:
+        If box given to the lable is larger than needed:
+            >>> label['anchor'] = "nw"
+            # as strings:  e, se, sw, w, nw, n, center
+            # as singles or tuples of Tk constants: NW, (N, W)
+    For multi-line variables:
+        Use '\n' in the text or textvariable str.
+        Can use the justify option: left, center, right
+        (For single line text, best use anchor option.
+Button  Very much for interaction!
+    Can display text or images. accept additional options...
+    >>> button = ttk.Button(parent, text='Okay', command=submitForm)
+    Config options...
+        text, textvariable, image, compound as for labels
+        default config option:  <active> triggered by "Return" key.
+            active  vs normal (the default)  !! needs clarification
+            If active still need to be bound to a desired event.
+        command option connects button's action to script provided
+            >>> action = ttk.Button(root, text="Action",
+                                default="active", command=myaction)
+            >>> root.bind('<Return>', lambda e: action.invoke())
+        state and instate methods:
+            All themed widgets maintain an internal state,
+            represented as a series of binary flags, each can be
+            set (on) or cleared (off) or interogated or tied to a
+            command. Buttons make use of the disabled flag to
+            control whether or not users can press the button.
+        >>> b.state(['disabled'])          # set the disabled flag
+        >>> b.state(['!disabled'])         # clear flag
+        >>> b.instate(['disabled'])        # True if disabled
+        >>> b.instate(['!disabled'])       # True if not disabled
+        >>> b.instate(['!disabled'], cmd)
+                    # execute 'cmd' if not disabled
+            Note: arguments are a list of state flags
+            State flags available to themed widgets:
+                active, disabled, focus, pressed, selected,
+                background, readonly, alternate, and invalid.
+              Described in the themed widget reference.
+              All widgets have the same set of state flags,
+              not all states are meaningful for all widgets.
+              May specify >1 state flag. (param is a list)
+Checkbutton- ...holds a binary value (a toggle)
+    >>> measureSystem = StringVar()
+    >>> check = ttk.Checkbutton(parent, text='Use Metric', 
+                command=metricChanged, variable=measureSystem,
+                onvalue='metric', offvalue='imperial')
+    Checkbuttons The text, textvariable, image, and compound options 
+    control the display of the label (next to the checkbox itself).
+    The command option: an executable to be called with each toggle.
+    The invoke method will also execute the same command.
+    The state and instate methods allow you to manipulate the
+    disabled state flag to enable or disable the checkbutton.
+    Unlike regular buttons, checkbuttons also hold a value linked to 
+    a variable:
+    The variable option links a variable to the widget.s current value.
+    This variable is updated whenever the widget is toggled.
+    By default, value = 1 when checked and 0 when not checked.
+    can be changed using the onvalue and offvalue options.
+    The linked variable must be initialized to a starting value.
+    When linked variable does not contain on/offvalue or doesn't
+    exist the check button goes into a special
+    "tristate"/indeterminate mode. Introspection of state flag:
+    >>> check.instate(['alternate'])
+    Attachment of variables ot widgets can be done with class
+    instances of any of the following:
+        s = StringVar(value="abc")   # default value is ''
+        b = BooleanVar(value=True)   # default is False
+        i = IntVar(value=10)         # default is 0
+        d = DoubleVar(value=10.5)    # default is 0.0
+Radiobutton: choose one of several mutually exclusive options
+    Always used together in a set, where each is tied to a single
+    choice or preference. Appropriate for 3-5 options.
+    >>> phone = StringVar()
+    >>> home = ttk.Radiobutton(parent, text='Home',
+                                variable=phone, value='home')
+    >>> office = ttk.Radiobutton(parent, text='Office',
+                                variable=phone, value='office')
+    >>> cell = ttk.Radiobutton(parent, text='Mobile',
+                                variable=phone, value='cell')
+   Radiobuttons mostly have same configuration options as checkbuttons.
+   Exception: onvalue and offvalue options are replaced with a single
+   value option. Each radiobutton in the set will have the same linked
+   variable but a different value. When the variable holds the matching
+   value, that radiobutton will visually indicate it is selected.
+   If it doesn't match, the radiobutton will be unselected.
+   If the linked variable doesn't exist, or you don't specify one with
+   the variable option, radiobuttons also display as "tristate" or
+   indeterminate. This can be checked via the alternate state flag. 
+Entry: provides a single line text entry field.
+    >>> username = StringVar()
+    >>> name = ttk.Entry(parent, textvariable=username)
+    >>> name['width'] = 25  # optional eg 5 for zip code
+    Unlike the various buttons, entries don't have an associated
+    text or image. Must use a separate label to identify them.
+    May retrieve or change without use of linked variable:
+        get method: returns the current value,
+        delete method: remove all or part of the value
+    >>> print(f'current value is {name.get()}')
+    >>> name.delete(0, 'end')    # delete between two indices, 0-based
+    >>> name.insert(0, 'your name') # insert new text at a given index
+    No command option! Watch for changes by monitoring the linked
+    variable using trace_add method. (Also Validion)
+    >>> def it_has_been_written(*args):
+    >>>     ...
+    >>> username.trace_add("write", it_has_been_written)    
+Passwords: use show config options to set char to display.
+    >>> passwd = ttk.Entry(parent, textvariable=password, show="*")
+Widget States: 
+    Entries may also be put into a disabled state via the state command
+    (and queried with instate).
+    Setting the state flag readonly: entry is unchangable (although
+    its text can be selected and copied to clipboard.)
+    Failure of validation ==> invalid state....
+Validation: use the validatecommand config option.
+    Supply code that returns True or False.
+    >>> import re
+    >>> def check_num(newval):
+    >>>  return re.match('^[0-9]*$', newval) is not None and len(newval) <= 5
+    >>> check_num_wrapper = (root.register(check_num), '%P')
+
+num = StringVar()
+e = ttk.Entry(root, textvariable=num, validate='key', validatecommand=check_num_wrapper)
+e.grid(column=0, row=0, sticky='we')
