@@ -196,12 +196,69 @@ Widget States:
     its text can be selected and copied to clipboard.)
     Failure of validation ==> invalid state....
 Validation: use the validatecommand config option.
+    Can check for validity as well as when to do so.
     Supply code that returns True or False.
     >>> import re
     >>> def check_num(newval):
-    >>>  return re.match('^[0-9]*$', newval) is not None and len(newval) <= 5
+    >>>    return re.match('^[0-9]*$', newval) is not None
+                                            and len(newval) <= 5
     >>> check_num_wrapper = (root.register(check_num), '%P')
 
-num = StringVar()
-e = ttk.Entry(root, textvariable=num, validate='key', validatecommand=check_num_wrapper)
-e.grid(column=0, row=0, sticky='we')
+    >>> num = StringVar()
+    >>> e = ttk.Entry(root, textvariable=num, validate='key',
+                     validatecommand=check_num_wrapper)
+    >>> e.grid(column=0, row=0, sticky='we')
+    # The 'key' value to the validate option => validation
+    # on every keystroke.
+    # percent sustitutions: provide access to more info:
+    #   '%P' the new value of the entry (if validation succeeds.
+    Ugly code gymnastics: The register method (callable on any widget)
+    creates a Tcl procedure which will call our Python function.
+    Our chosen % substitutions will be passed to it as parameters. 
+    Validation: full validation only when entry loses focus,
+                prevalidation: accepting changes on each keystroke.
+    Response to errors: add a message reminder to appear if wrong key
+    is typed or tab away when entry is not valid.
+    Add a (dummy) button to "process" the zip code; button is disabled
+    unless entry is valid.
+    Add a 'name' entry so you can tab away from the zip entry.
+    #### Need to go back and figure it all out!!! ####
+
+Combobox widget: combines an entry with a list of choices.
+    May choose from a set of values (typical) or insert own value.
+    >>> countryvar = StringVar()
+    >>> country = ttk.Combobox(parent, textvariable=countryvar)
+
+    Like entries, the textvariable option links a variable in your
+    program to the current value of the combobox. As with other widgets,
+    you should initialize the linked variable in your own code.
+
+    A combobox will generate a <<ComboboxSelected>> virtual event that
+    you can bind to whenever its value changes. (You could also trace
+    changes on the textvariable, as we've seen in the previous few widgets
+    we covered. Binding to the event is more straightforward, and so tends
+    to be our preferred choice.)
+    >>> country.bind('<<ComboboxSelected>>', function) 
+    Can provide a listing of predefined values from which to choose:
+    >>> country['values'] = ('USA', 'Canada', 'Australia')
+    If set, the readonly state flag will restrict users to making choices
+    only from the list of predefined values but not be able to enter their
+    own (though if the current value of the combobox is not in the list,
+    it won't be changed)
+    >>> country.state(["readonly"])
+    You can also get the current value using the get method and change
+    the current value using the set method (which takes a single argument,
+    the new value).
+
+    To complement the get and set methods, you can also use the current
+    method to determine which item in the predefined values list is
+    selected. Call current with no arguments; it will return a 0-based
+    index into the list or -1 if the current value is not in the list.
+    You can select an item in the list by calling current with a single
+    0-based index argument.
+    Want to associate some other value with each item in the list so that
+    your program can use one value internally, but it gets displayed in
+    the combobox as something else? You'll want to have a look at the
+    section entitled "Keeping Extra Item Data" when we get to the
+    discussion of listboxes in a couple of chapters from now.
+

@@ -2,27 +2,17 @@
 
 # File: ~/Git/TK/textual.py
 
-import tkinter as tk
-from tkinter import messagebox
-import routines
-
 """
 global_choice = None  # used globally to collect
 global_res = {}         # info from the gui window
+
+Attempt to replace all utility previously in Git/Sql/code/textual.py
+but infact too much is being done there so need to seriously refactor!
 """
-# the following function should be elsewhere!?!
-# is it even needed?
-junk = '''
-def get_stati(personID):
-    """
-    ## Was called get_mode(
-    collects Person_Status table entries for person IDed.
-    """
-    ps_fields = routines.keys_from_schema("Person_Status")
-    res = routines.fetch(f"""SELECT * FROM Person_Status
-            WHERE personID = {personID}; """, from_file=False)
-#   _ = input(repr(res))  #!# <res> is NOT USED!!!
-'''
+
+import tkinter as tk
+from tkinter import messagebox
+import routines
 
 def keys_from_schema(table, brackets=(0,0)):
     """
@@ -168,25 +158,6 @@ def edit_person_status():
     _ = input("edit_person_status hasn't been 'translated'!")
 
 
-def get_demographics(header="Enter demographic data",
-                     applicant=True):
-    """
-    Collects all demographic data to populate the People table
-    AND (unless <applicant> is set to <False>) also collect entries
-    for two sponsor names and app_rcvd and fee_rcvd fields.
-    Returns a dict or None (if user aborts.)
-    Client is code/data_entry.py
-    """
-    keys = keys_from_schema("People", brackets=(1,0))
-    if applicant:
-        header = "Enter applicant demographics"
-        keys.extend(["sponsor1", "sponsor2", "app_rcvd", "fee_rcvd"])
-    mapping = {}
-    for key in keys:
-        mapping[key] = ""
-    return get_fields(mapping, header)
-
-
 def people_choices(header_prompt="Enter hints: % = wild card"):
     """
     Returns a list of people records based on hints provided.
@@ -225,60 +196,6 @@ def people_choices(header_prompt="Enter hints: % = wild card"):
     ret = routines.query2dict_listing(query, keys,
             from_file=False)
     return ret
-
-
-def pick(query, format_string,
-                header="CHOOSE ONE",
-                subheader="Choices are...",
-                report=None):
-    """
-    Uses <query> to collect a list of dicts and presents
-    user with a list of choices dictated by
-    the format_string.
-    Returns chosen dict or None (if none available or
-    user aborts/cancels.)
-    """
-    mappings = routines.query2dicts(query)
-    if not mappings:
-        return
-    options = [format_string.format(**rec)
-            for rec in mappings]
-    listing = zip(range(len(options)), options)
-    for_display = [f"{item[0]:>2}: {item[1]}"
-                for item in listing]
-    #===================================
-    layout=[[sg.Text(subheader,size=(50,1),
-#           font='Lucida',justification='left'
-            )],
-            [sg.Listbox(values=for_display,
-                select_mode='extended',
-                key='CHOICE', size=(50,len(mappings)))],
-            [sg.Button('SELECT',
-#               font=('Times New Roman',12)
-                ),
-            sg.Button('CANCEL',
-#                   font=('Times New Roman',12)
-                    )
-            ]]
-    win =sg.Window(header,layout)
-    e, v = win.read()
-    win.close()
-    if not v["CHOICE"]:
-        return
-    chosen_item = v['CHOICE'][0].strip().split()[0][:-1]
-    if (e != "SELECT") or not v['CHOICE']:
-        helpers.add2report(report,
-            "pick returning None", also_print=True)
-        return
-    else:
-        helpers.add2report(report,
-            ["code.textual.pick:",
-            "  line chosen...",
-            f"    {repr(v['CHOICE'])}",
-            "  record returned:",
-            f"    {repr(mappings[int(chosen_item)])}"],
-            also_print=False)
-        return mappings[int(chosen_item)]
 
 
 ## Testing follows....
@@ -330,7 +247,10 @@ def pick_person(header='Hints (use "%" as wild card)',
             hints[field] = ""
         while True:
             res = updated_mapping(hints, root_title=header)
-            values = [value if value for value in res.values()]
+#           _ = input(f"{res=}")
+            values = [value for value in res.values() if value]
+            if "quit" in values:
+                root.destroy()
             if not values:  # checking for an empty list
                 print("Got an empty list; try again.")
                 continue
@@ -418,11 +338,10 @@ def run_text_menu():
 if __name__ == "__main__":
 #   run_updated_mapping()
 #   checkYN()
-#   print(f"Returning '{text_menu()}'")
-#   run_get_demographics()
+    run_get_demographics()
 #   run_people_choices()
 #   run_text_menu()
-    run_pick_person()
+#   run_pick_person()
 
 
 

@@ -1,13 +1,29 @@
 #!/usr/bin/env python3
 
-# File: func_menu.py
-
-"""
-"""
+# File: gui.py  (graphical user interface using tKinter)
 
 import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
 
 default_func_menu_header = "Choose a Function to Run"
+
+def yn(title, message):
+    """
+    Returns True or False.
+    Note: closing the window using the [x] button in the top right
+    corner also returns false (same as hitting the "No" box.)
+    """
+    def show_yes_no_dialog():
+        result = messagebox.askyesno(title, message)
+        root.destroy()
+        return result
+    root = tk.Tk()
+    root.withdraw()    # Hide the main window
+    ret = show_yes_no_dialog()
+    root.mainloop()
+    return ret
+
 
 def func_menu(funcs, header=default_func_menu_header):
     """
@@ -61,6 +77,17 @@ def func_menu(funcs, header=default_func_menu_header):
 
     root.mainloop()
 
+def checkYN():
+    title = "Exit Application"
+    message = """This could be a very long message.
+        Several lines long, infact!
+        Do you really want to exit?"""
+
+    if yn(title, message):
+        print("Returning True")
+    else:
+        print("Returning False")
+
 def ck_func_menu():
     def func1():
         print(f"Executing func1")
@@ -80,5 +107,13 @@ def ck_func_menu():
     
     func_menu(funcs)
 
+
 if __name__ == "__main__":
-    ck_func_menu()
+    test_funcs = (checkYN, ck_func_menu, )
+    print("Choose which function to test:")
+    for index, func in enumerate(test_funcs, start=1):
+        print(f"  {index:>3}  {func.__name__}")
+    choice = input(f"Which one? (1..{len(test_funcs)}) ")
+    func_index = int(choice) -1
+    test_funcs[func_index]()
+
