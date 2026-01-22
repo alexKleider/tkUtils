@@ -4,32 +4,34 @@
 
 import tkinter as tk
 
-root_title = "Root Title"
-# List of choices
-choices = ["Apple", "Banana", "Cherry", "Date", "Elderberry"]
+returned_choice = None
 
-returned_choice = "No selection made"
-
-def text_menu(choices=choices, rootTitle=root_title):
-
+def text_menu(choices, rootTitle):
+    """
+    Relies on presence of the global "returned_choice".
+    Returns None if window is closed using the (top right) [X]
+    """
     def show_selection(event):
         # Get the index of the selected item
         global returned_choice
         selection_index = listbox.curselection()
         if selection_index:
             # Get the value of the selected item
-            selected_item = listbox.get(selection_index[0])
-            label.config(text=f"Selected: {selected_item}")
-            returned_choice = selected_item
-#           print(f"Selected: {selected_item}")
-            root.quit()
+            returned_choice = listbox.get(selection_index[0])
+            label.config(text=f"Selected: {returned_choice}")
+        else:
+            returned_choice = None
+#           print(f"Selected: {returned_choice}")
+        root.quit()
 
     # --- Main Application ---
     root = tk.Tk()
     root.title("Listbox Menu Example")
 
     # Create a Listbox widget
-    listbox = tk.Listbox(root, selectmode=tk.SINGLE)
+    listbox = tk.Listbox(root,
+                         selectmode=tk.SINGLE,
+                         width=0)
     listbox.pack(padx=10, pady=10)
 
     # Populate the Listbox with choices
@@ -47,6 +49,18 @@ def text_menu(choices=choices, rootTitle=root_title):
 
     return returned_choice
 
+def ck_text_menu():
+    root_title = "Root Title"
+    # List of choices
+    choices = ["AppleAppleAppleAppleAppleAppleAppleAppleAppleAppleAppleAppleAppleAppleApple",
+               "BananaBananaBananaBananaBananaBananaBananaBanana",
+               "CherryCherryCherryCherryCherryCherryCherryCherryCherryCherryCherryCherryCherry",
+               "DateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDate",
+               "ElderberryElderberryElderberryElderberryElderberryElderberryElderberryElderberryElderberryElderberryElderberry"]
+    ret = text_menu(choices, root_title)
+    print("Returning....")
+    print(repr(ret))
+
 if __name__ == "__main__":
-    print(f"Returning '{text_menu()}'")
+    ck_text_menu()
 
