@@ -6,7 +6,16 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
-default_func_menu_header = "Choose a Function to Run"
+"""
+Provides: so far- 
+    yn
+    func_menu
+    text_menu
+    update_mapping
+"""
+
+returned_choice = None  # a Global required by text_menu
+global_res = {}  #  a Global required by update_mapping
 
 def yn(title, message):
     """
@@ -25,7 +34,7 @@ def yn(title, message):
     return ret
 
 
-def func_menu(funcs, header=default_func_menu_header):
+def func_menu(funcs, header="Choose a Function to Run"):
     """
     <funcs> is a listing of functions.
     The one chosen is executed (unless user exits using [X].)
@@ -77,8 +86,6 @@ def func_menu(funcs, header=default_func_menu_header):
 
     root.mainloop()
 
-returned_choice = None
-
 def text_menu(choices, rootTitle):
     """
     Relies on presence of the global "returned_choice".
@@ -119,15 +126,55 @@ def text_menu(choices, rootTitle):
     label.pack(pady=10)
 
     root.mainloop()
-
     return returned_choice
+
+
+def updated_mapping(mapping, root_title="Record Update"):
+    """
+    Provides a way of entering or modifying the values of a
+    <mapping>, presented in a window labeled <root_title>.
+    Returns None if closed without using the submit button.
+    The <submit> button causes return of a new mapping with
+    the visible values. The original mapping is left unchanged.
+    Retrieval depends on <global_res> which must exist globally.
+    """
+    def submit_data():
+        global global_res
+        for key in mapping.keys():
+            global_res[key] = str_vars[key].get()
+        root.destroy()
+
+    root = tk.Tk()
+    root.title(root_title)
+
+    keys = mapping.keys()
+    labels = {}
+    str_vars = {}
+    values = {}
+
+    row = 0;
+
+    for key, value in mapping.items():
+        labels[key] = tk.Label(root, text=key)
+        labels[key].grid(row=row, column=0)
+        str_vars[key] = tk.StringVar(value=value)
+        values[key] = tk.Entry(root, textvariable=str_vars[key])
+        values[key].grid(row=row, column=1)
+        row += 1;
+
+    # Submit Button
+    submit_button = tk.Button(root, text="Submit", command=submit_data)
+    submit_button.grid(row=row, column=1)
+
+    root.mainloop()
+    return global_res
+
 
 def checkYN():
     title = "Exit Application"
     message = """This could be a very long message.
         Several lines long, infact!
         Do you really want to exit?"""
-
     if yn(title, message):
         print("Returning True")
     else:
@@ -150,8 +197,8 @@ def ck_func_menu():
         print(f"Executing func6")
     funcs = (func1, func2, func3, func4, func5, func6 )
     
+    print(f"Running func_menu...")
     func_menu(funcs)
-
 
 def ck_text_menu():
     root_title = "Root Title"
@@ -162,15 +209,41 @@ def ck_text_menu():
                "DateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDateDate",
                "ElderberryElderberryElderberryElderberryElderberryElderberryElderberryElderberryElderberryElderberryElderberry"]
     ret = text_menu(choices, root_title)
-    print("Returning....")
+    
+    print("Your choice...")
     print(repr(ret))
 
+
+def ck_updated_mapping():
+    mapping = {
+            "First": "Joe",
+            "Last": "Blow", 
+            "Phone": "333/333-3333",
+             }
+    root_title = "People Entry"
+    res = updated_mapping(mapping, root_title)
+    if res:
+        for key, value in res.items():
+            print(f"{key}: {value}")
+    else:
+        print(f"Entry aborted (returned {res=})")
+
+
 if __name__ == "__main__":
-    test_funcs = (checkYN, ck_func_menu, ck_text_menu, )
+    test_funcs = (checkYN,
+                  ck_func_menu,
+                  ck_text_menu,
+                  ck_updated_mapping)
     print("Choose which function to test:")
     for index, func in enumerate(test_funcs, start=1):
         print(f"  {index:>3}  {func.__name__}")
     choice = input(f"Which one? (1..{len(test_funcs)}) ")
     func_index = int(choice) -1
-    test_funcs[func_index]()
+    func = test_funcs[func_index]
+    print(f"Testing {func.__name__}...")
+    func()
+    print(f"...finished testing {func.__name__}...")
+
+
+
 
