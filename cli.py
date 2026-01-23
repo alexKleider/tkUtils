@@ -10,12 +10,15 @@ Provides command line interfaces to the following...
     update_mapping
 """
 
-def yn(title, message):
+def yn(title='', message="Answer yY)es or nN)o"):
     """
     Returns True or False.
+    <title> (ignored if None or empty) serves as a
+    header which is printed and underlined ("=");
     """
-    print(title)
-    print("=" * len(title))
+    if title:
+        print(title)
+        print("=" * len(title))
     print(message)
     yn = input("Yes or No? (y/n) ")
     if yn and yn[0] in "yY":
@@ -23,12 +26,52 @@ def yn(title, message):
 
 
 
-def func_menu(funcs, header="Choose a Function to Run"):
+def func_menu(funcs, header="Choose a Function to Run..."):
     """
     <funcs> is a listing of functions.
-    The one chosen is executed (unless user exits using [X].)
+    The one chosen is executed (unless user responds
+    with an invalid index.)
+    <header> (if evaluates to True) is printed and underlined.
     """
-    pass
+    if header:
+        print(header)
+        print("=" * len(header))
+    for index, func in enumerate(funcs, start=1):
+        print(f"  {index:>3}  {func.__name__}")
+    choice = input(f"Which one? (1..{len(funcs)}) ")
+    try:
+        choice = int(choice)
+    except ValueError:
+        print("Choice must evaluate to an integer!")
+        return
+    if choice<1 or choice>len(funcs):
+        print(f"{choice} is out of range.")
+        return
+    funcs[choice-1]()
+#   func_index = choice - 1
+#   func = funcs[func_index]
+#   func()
+
+def ck_func_menu():
+    def func1():
+        print(f"Executing func1")
+        return "f1"
+    def func2():
+        print(f"Executing func2")
+    def func3():
+        print(f"Executing func3")
+    def func4():
+        print(f"Executing func4")
+        return "f4"
+    def func5():
+        print(f"Executing func5")
+    def func6():
+        print(f"Executing func6")
+    funcs = (func1, func2, func3, func4, func5, func6 )
+    
+    print(f"Running func_menu...")
+    func_menu(funcs)
+
 
 def text_menu(choices, rootTitle):
     """
@@ -74,9 +117,8 @@ def ck_func_menu():
     def func6():
         print(f"Executing func6")
     funcs = (func1, func2, func3, func4, func5, func6 )
-    
-    print(f"Running func_menu...")
-    func_menu(funcs)
+#   print(f"Running func_menu...")
+    func_menu(funcs, "Available functions:")
 
 def ck_text_menu():
     root_title = "Root Title"
