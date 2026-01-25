@@ -88,7 +88,27 @@ def updated_mapping(mapping, root_title="Record Update"):
     Key/Value pairs are presented under the header <root_title>.
     Allows for aborting in which case returns None.
     """
-    pass
+    while True:
+        ret = {key: value for key, value in mapping.items()}
+        print(f"{root_title}")
+        print("=" * len(root_title))
+        print("Update values, RTN for no change, space to zero out...")
+        for key, value in mapping.items():
+            print(f"{key}: {value}")
+            new_val = input("Updated value: ")
+            if new_val:
+                if new_val.strip() == "": ret[key] = ""
+                else: ret[key] = new_val
+            else:
+                ret[key] = mapping[key]
+        print()
+        print("Accept following values:")
+        for key, value in ret.items():
+            print(f"{key}: {value}")
+        yn = input("Accept above mapping? (y/n) ('Q' to abort) ")
+        if yn:
+            if yn[0] in "yY": return ret
+            if yn[0] in "qQ":return
 
 
 def checkYN():
