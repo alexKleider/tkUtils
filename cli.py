@@ -10,7 +10,7 @@ Provides command line interfaces to the following...
     update_mapping
 """
 
-def yn(title='', message="Answer yY)es or nN)o"):
+def yn(title, message):
     """
     Returns True or False.
     <title> (ignored if None or empty) serves as a
@@ -78,7 +78,21 @@ def text_menu(choices, rootTitle):
     Returns text chosen from list of <choices>.
     Returns empty string if no choice is made.
     """
-    pass
+    n = len(choices)
+    while True:
+        print(rootTitle)
+        print("=" * len(rootTitle))
+        for index, choice in enumerate(choices, start=1):
+            print(f'{index:>3}: {choice}')
+        try:
+            ret = int(input("Which one: (1..{n} "))
+        except ValueError:
+            print("Invalid response!")
+            break
+        if ret >0 and ret<=n:
+            return choices[ret-1]
+        else:
+            print("Out of range response!")
 
 
 def updated_mapping(mapping, root_title="Record Update"):

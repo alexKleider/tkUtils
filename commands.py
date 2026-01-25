@@ -32,36 +32,47 @@ def add_person():
 
 def select_person():
     """
-    Provide cluse to be given choices from which
-    to select a person.
+    User provides clues which are then used
+    to select an entry from the People table.
+    Clues are processed using "AND" not "OR".
+    (This can be changed using the and_or variable.)
+    Returns a tuple: (personID, 'first', 'last')
+    or None
     """
+#   and_or = " OR "
+    and_or = " AND "
+    no_clues="""No clues submitted!
+Have another go?"""
     while True:
-        keys = ("first", "last", )
-        mapping = {key: "" for key in keys}
-        ret = interface.updated_mapping(mapping,
-                    root_title="Enter clues using % wildcard:")
-        if not ret:
-            if interface.yn(title="Abort?!?"): return
-            else: continue
-        ret4query = {}
-        for key, value in ret.items():
-            if value:
-                ret4query[key] = value
-        if not ret4query:
-            if interface.yn(title = "Abort!?!?"):  # use default message
-                return
-            else: continue
-        break
-    res = {key: value for key, value in ret4query.items() if value}
-    condition = [f'{key} LIKE "{value}"' for key, value
-                 in res.items() if value]
-    condition = ' and '.join(condition)
-    query = f'''SELECT personID, first, last from People
-            WHERE {condition}; ''';
-    print(query)
-    for line in routines.fetch(query, from_file=False):
-        print(line)
-    
+        while True:
+            keys = ("first", "last", )
+            mapping = {key: "" for key in keys}
+            ret = interface.updated_mapping(mapping,
+                        root_title="Enter clues using % as wildcard:")
+            # set up the query:
+            ret4query = {}
+            for key, value in ret.items():
+                if value:
+                    ret4query[key] = value
+            if not ret4query:  # no clues submitted
+                if interface.yn(title = "Try again?",
+                                message=no_clues):
+                    continue
+                else:
+                    return
+            break  # out of inner while True statement
+
+        res = {key: value for key, value in ret4query.items() if value}
+        condition = [f'{key} LIKE "{value}"' for key, value
+                     in res.items() if value]
+        condition = and_or.join(condition)
+        query = f'''SELECT personID, first, last from People
+                WHERE {condition}; ''';
+        choices = [str(res) for res in
+                   routines.fetch(query, from_file=False)]
+        return interface.text_menu(choices, "Chose person...")
+
+        
 
 
 def write_query():
@@ -85,5 +96,5 @@ def add_applicant():
 if __name__ == "__main__":
 #   write_query()
 #   add_person()
-    select_person()
+    print(select_person())
 
